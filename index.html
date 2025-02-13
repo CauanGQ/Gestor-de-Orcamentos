@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerar Orçamento</title>
+  <link rel="stylesheet" href="stylesOrçamento.css">
+</head>
+<body>
+  <style>
+    /* Estilo geral */
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #121212; /* Fundo escuro */
+  color: #e0e0e0; /* Texto claro */
+}
+
+h1, h2 {
+  text-align: center;
+  color: #00bcd4; /* Azul claro */
+  text-shadow: 0 0 10px #00bcd4, 0 0 20px #00bcd4;
+}
+
+a {
+  color: #00e676; /* Verde neon */
+  text-decoration: none;
+}
+
+/* Esconder o input original */
+input[type="file"] {
+  display: none;
+}
+
+/* Estilo para o botão personalizado */
+.custom-file-upload {
+  padding: 10px 20px;
+  border-radius: 5px;
+  background-color: #00bcd4;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 14px;
+  box-shadow: 0 0 10px #00bcd4, 0 0 20px #00bcd4;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.custom-file-upload:hover {
+  background-color: #0097a7; /* Cor mais escura no hover */
+  box-shadow: 0 0 15px #00bcd4, 0 0 30px #00bcd4;
+}
+
+a:hover {
+  text-shadow: 0 0 8px #00e676;
+}
+
+/* Estilo do popup */
+.popup {
+  display: none;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 320px;
+  padding: 20px;
+  background-color: #1e1e1e; /* Fundo escuro */
+  border: 2px solid #00bcd4; /* Borda azul */
+  box-shadow: 0 0 20px #00bcd4; /* Sombra azul neon */
+  z-index: 1000;
+  color: #e0e0e0; /* Texto claro */
+}
+
+/* Fundo escuro ao redor */
+.popup-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8); /* Fundo escuro com opacidade */
+  z-index: 999;
+}
+
+/* Estilo da lista */
+ul {
+  list-style-type: none;
+  padding: 0px;
+}
+
+ul li {
+  padding: 10px;
+  background-color: #232323; /* Fundo escuro da lista */
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #444444;
+  color: #00e676; /* Texto em verde neon */
+}
+
+ul li span {
+  flex-grow: 1;
+  color: #e0e0e0;
+}
+
+ul li strong.valorTotal {
+ position: relative;
+ right: 15px;
+}
+/* Estilo dos botões */
+button {
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #1e1e1e; /* Fundo escuro do botão */
+  color: #00bcd4; /* Azul neon */
+  box-shadow: 0 0 10px #00bcd4, 0 0 20px #00bcd4;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+button:hover {
+  background-color: #00bcd4; /* Muda o fundo para azul neon no hover */
+  color: #1e1e1e;
+  box-shadow: 0 0 15px #00bcd4, 0 0 30px #00bcd4;
+}
+
+/* Estilo para os botões de editar e excluir */
+button.editar {
+  background-color: #00bcd4;
+  color: #ffffff;
+  box-shadow: 0 0 10px #00bcd4, 0 0 20px #00bcd4;
+}
+
+button.editar:hover {
+  background-color: #0097a7; /* Tom mais escuro de azul no hover */
+  box-shadow: 0 0 15px #00bcd4, 0 0 30px #00bcd4;
+}
+
+button.excluir {
+  background-color: #ff1744; /* Vermelho para destacar exclusão */
+  color: #ffffff;
+  box-shadow: 0 0 10px #ff1744, 0 0 20px #ff1744;
+}
+
+button.excluir:hover {
+  background-color: #d50000; /* Tom mais escuro de vermelho no hover */
+  box-shadow: 0 0 15px #ff1744, 0 0 30px #ff1744;
+}
+
+/* Estilo do campo de input */
+input, select {
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 2px solid #444444;
+  border-radius: 5px;
+  background-color: #2a2a2a; /* Fundo escuro dos inputs */
+  color: #e0e0e0;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #00bcd4; /* Azul neon no foco */
+  box-shadow: 0 0 10px #00bcd4, 0 0 20px #00bcd4;
+}
+
+/* Estilo do botão de adicionar item no popup */
+#adicionar-item {
+  background-color: #00e676;
+  color: #1e1e1e;
+  box-shadow: 0 0 15px #00e676, 0 0 30px #00e676;
+}
+
+#adicionar-item:hover {
+  background-color: #1e1e1e;
+  color: #00e676;
+}
+
+/* Estilos para centralizar os botões e label */
+.container-botoes {
+  display: flex;
+  justify-content: center; /* Centraliza horizontalmente */
+  align-items: center; /* Alinha verticalmente */
+  gap: 20px; /* Espaçamento entre os botões */
+  margin-top: 20px; /* Espaçamento superior */
+}
+
+button, .custom-file-upload {
+  margin: 10px;
+}
+
+  </style>
+  <h1>Gerar Orçamento</h1>
+
+   <!-- Botões de adicionar e carregar -->
+  <div class="container-botoes">
+    <button id="abrir-popup">Adicionar Item</button>
+    <button id="salvar-orcamento">Salvar Orçamento</button>
+    <label for="carregar-orcamento" class="custom-file-upload">Escolher Arquivo</label>
+    <input type="file" id="carregar-orcamento">
+  </div>
+  
+  <!-- Lista que será preenchida -->
+  <ul id="lista-itens"></ul>
+
+
+  <!-- Fundo escuro -->
+  <div id="popup-overlay" class="popup-overlay"></div>
+
+  <!-- Popup para adicionar ou editar itens -->
+  <div id="popup" class="popup">
+    <h2>Adicionar ou Editar Item</h2>
+    <label for="item-descricao">Nome da conta:</label>
+    <input type="text" id="item-descricao">
+    
+    <label for="item-preco">Preço Unitário:</label>
+    <input type="number" id="item-preco" min="0" step="0.01" value="0">
+    
+<label for="item-pagamento">Pagamento:</label>
+<select id="item-pagamento">
+  <option value="avista">À vista</option>
+  <option value="parcelado">Parcelado</option>
+  <option value="repetir">Repetir Conta</option>
+</select>
+
+<div id="repetir-container" style="display: none;">
+  <label for="item-repetir">Repetir conta:</label>
+  <input type="number" id="item-repetir" min="0" value="0" placeholder="Quantidade de vezes">
+  <label for="item-repetir-sempre">
+    <input type="checkbox" id="item-repetir-sempre"> Repetir sempre
+  </label>
+</div>
+
+    <label for="item-vencimento">Data de Vencimento:</label>
+    <input type="date" id="item-vencimento">
+    
+    <div id="parcelas-container" style="display: none;">
+      <label for="item-parcelas">Número de Parcelas:</label>
+      <input type="number" id="item-parcelas" min="1" value="1">
+    </div>
+    
+    <br>
+    <button id="adicionar-item">Adicionar</button>
+    <button id="fechar-popup">Fechar</button>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+  const abrirPopupBtn = document.getElementById("abrir-popup");
+  const fecharPopupBtn = document.getElementById("fechar-popup");
+  const adicionarItemBtn = document.getElementById("adicionar-item");
+  const salvarOrcamentoBtn = document.getElementById("salvar-orcamento");
+  const carregarOrcamentoInput = document.getElementById("carregar-orcamento");
+  const popup = document.getElementById("popup");
+  const overlay = document.getElementById("popup-overlay");
+  const listaItens = document.getElementById("lista-itens");
+  const descricaoInput = document.getElementById("item-descricao");
+  const precoInput = document.getElementById("item-preco");
+  const pagamentoInput = document.getElementById("item-pagamento");
+  const parcelasContainer = document.getElementById("parcelas-container");
+  const parcelasInput = document.getElementById("item-parcelas");
+  const vencimentoInput = document.getElementById("item-vencimento");
+  const repetirContainer = document.getElementById("item-repetir-container"); // Container para o campo de repetição
+
+  let orcamento = []; // Assumindo que este array armazena os itens do orçamento
+  let itemEditando = null;
+
+  pagamentoInput.addEventListener("change", function () {
+  if (pagamentoInput.value === "parcelado") {
+    parcelasContainer.style.display = "block";
+    document.getElementById("repetir-container").style.display = "none"; // Oculta repetição ao parcelar
+  } else if (pagamentoInput.value === "repetir") {
+    parcelasContainer.style.display = "none"; // Oculta parcelas ao repetir
+    document.getElementById("repetir-container").style.display = "block"; // Mostra repetição ao repetir
+  } else {
+    parcelasContainer.style.display = "none";
+    document.getElementById("repetir-container").style.display = "none"; // Oculta ambos se não for parcelado nem repetir
+  }
+});
+
+
+  function abrirPopup() {
+    popup.style.display = 'block';
+    overlay.style.display = 'block';
+    itemEditando = null;
+  }
+
+  function fecharPopup() {
+    popup.style.display = 'none';
+    overlay.style.display = 'none';
+    limparCampos();
+  }
+
+  function limparCampos() {
+  descricaoInput.value = '';
+  precoInput.value = '';
+  pagamentoInput.value = "avista";
+  parcelasContainer.style.display = "none";
+  document.getElementById("repetir-container").style.display = "none"; // Oculta o campo de repetição
+  parcelasInput.value = 1;
+  vencimentoInput.value = '';
+  document.getElementById("item-repetir").value = 0; // Reseta valor de repetição
+  document.getElementById("item-repetir-sempre").checked = false; // Reseta checkbox de repetir sempre
+}
+
+  function adicionarItem() {
+    const descricao = descricaoInput.value.trim();
+    const preco = parseFloat(precoInput.value);
+    const pagamento = pagamentoInput.value;
+    const parcelas = parseInt(parcelasInput.value);
+    const vencimento = vencimentoInput.value ? new Date(vencimentoInput.value) : new Date();
+    const repetirContas = parseInt(document.getElementById("item-repetir").value); // Valor de repetição
+    const repetirIndefinido = document.getElementById("item-repetir-sempre").checked; // Checa repetição indefinida
+
+    if (descricao === "" || isNaN(preco) || preco <= 0) {
+      alert("Por favor, preencha a descrição e o preço corretamente.");
+      return;
+    }
+
+    if (pagamento === "parcelado" && (isNaN(parcelas) || parcelas <= 0)) {
+      alert("Por favor, insira um número válido de parcelas.");
+      return;
+    }
+
+    let total = preco;
+
+    if (pagamento === "parcelado" && parcelas > 1) {
+      total = preco / parcelas;
+    }
+
+    const item = {
+      descricao,
+      preco,
+      total,
+      pagamento,
+      parcelas,
+      pago: false,
+      vencimento,
+      parcelasPagas: 0,
+      parcelasDetalhadas: [],
+      repetir: pagamento === "repetir" ? repetirContas : 0, // Armazena o número de repetições
+      repetirIndefinido: pagamento === "repetir" ? repetirIndefinido : false, // Armazena se é indefinido
+    };
+
+    orcamento.push(item);
+    atualizarListaItens();
+    fecharPopup();
+  }
+
+  function editarItem(index) {
+    const item = orcamento[index];
+    descricaoInput.value = item.descricao;
+    precoInput.value = item.preco;
+    pagamentoInput.value = item.pagamento;
+    parcelasInput.value = item.parcelas;
+    vencimentoInput.value = item.vencimento.toISOString().split('T')[0];
+
+    if (item.pagamento === "parcelado") {
+      parcelasContainer.style.display = "block";
+    }
+
+    itemEditando = index;
+    abrirPopup();
+  }
+
+  function excluirItem(index) {
+    orcamento.splice(index, 1);  // Remove o item do array
+    atualizarListaItens();  // Atualiza a lista
+  }
+
+  function marcarComoPago(index) {
+    const item = orcamento[index];
+
+    if (item.parcelasPagas < item.parcelas) {
+        item.parcelasPagas++;
+        item.parcelasDetalhadas.push({
+            numero: item.parcelasPagas,
+            vencimento: new Date(item.vencimento),
+            pago: true
+        });
+
+        // Atualiza o vencimento para o próximo mês
+        item.vencimento.setMonth(item.vencimento.getMonth() + 1);
+    }
+
+    if (item.parcelasPagas === item.parcelas) {
+        item.pago = true; // Marca como completamente pago se todas as parcelas foram pagas
+
+        // Se o item tem repetições configuradas, adiciona a próxima repetição
+        if (item.repetir > 0) {
+            item.repetir--; // Decrementa o número de repetições restantes
+            const novoItem = { ...item }; // Copia o item original
+            novoItem.parcelasPagas = 0; // Reseta o número de parcelas pagas
+            novoItem.pago = false; // Marca o novo item como não pago
+            orcamento.push(novoItem); // Adiciona o novo item à lista de orçamento
+        } else if (item.repetirIndefinido) {
+            const novoItem = { ...item };
+            novoItem.parcelasPagas = 0;
+            novoItem.pago = false;
+            orcamento.push(novoItem);
+        }
+    }
+
+    atualizarListaItens();
+}
+
+  function desmarcarUltimaParcela(index) {
+    const item = orcamento[index];
+
+    if (item.parcelasPagas > 0) {
+      item.parcelasPagas--;
+      item.parcelasDetalhadas.pop();  // Remove a última parcela paga
+
+      // Atualiza o vencimento para o mês anterior
+      item.vencimento.setMonth(item.vencimento.getMonth() - 1);
+    }
+
+    if (item.parcelasPagas < item.parcelas) {
+      item.pago = false;  // Remove o status de completamente pago
+    }
+
+    atualizarListaItens();
+  }
+
+  function atualizarListaItens() {
+    listaItens.innerHTML = '';  // Limpa a lista de itens exibidos
+    const meses = {};
+
+    orcamento.forEach((item, index) => {
+        const mes = item.vencimento.toLocaleString('default', { month: 'long', year: 'numeric' });
+        if (!meses[mes]) {
+            meses[mes] = [];
+        }
+        meses[mes].push({ item, index });
+    });
+
+    const ordemMeses = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+
+    const mesesOrdenados = Object.keys(meses).sort((a, b) => {
+        const [mesA, anoA] = a.split(' ');
+        const [mesB, anoB] = b.split(' ');
+
+        const anoAInt = parseInt(anoA);
+        const anoBInt = parseInt(anoB);
+
+        // Se os anos forem diferentes, prioriza o ano mais recente
+        if (anoBInt !== anoAInt) {
+            return anoBInt - anoAInt;
+        }
+
+        // Caso o ano seja o mesmo, ordena os meses de acordo com a ordem especificada
+        const indiceMesA = ordemMeses.indexOf(new Date(`${mesA} 1`).toLocaleString('en-US', { month: 'long' }));
+        const indiceMesB = ordemMeses.indexOf(new Date(`${mesB} 1`).toLocaleString('en-US', { month: 'long' }));
+        return indiceMesA - indiceMesB;
+    });
+
+    mesesOrdenados.forEach(mes => {
+        const categoriaMes = document.createElement("div");
+        const tituloMes = document.createElement("h3");
+        tituloMes.textContent = mes;
+        categoriaMes.appendChild(tituloMes);
+
+        meses[mes].forEach(({ item, index }) => {
+            const novoItem = document.createElement("li");
+            novoItem.innerHTML = `
+              <p style="margin-bottom: 10px;">
+                <strong>${item.descricao} - R$ ${item.preco.toFixed(2)} (${item.pagamento === "parcelado" ? item.parcelas + " parcelas" : "À vista"})</strong><br>
+                <span>Total: R$ ${item.total.toFixed(2)}</span><br>
+                <span>Vencimento: ${item.vencimento.toLocaleDateString()}</span>
+              </p>
+              <div style="background-color: ${item.pago ? '#00FF00' : '#FF0000'}; color: #fff; padding: 5px; border-radius: 5px">
+                <span>${item.pago ? "Paga" : "Não Paga"} (${item.parcelasPagas}/${item.parcelas})</span>
+              </div>
+              <button class="editar">Editar</button>
+              <button class="excluir">Excluir</button>
+              <button class="pagar" style="display: ${item.parcelasPagas < item.parcelas ? 'block' : 'none'};">Marcar como Pago</button>
+              <button class="desmarcar" style="display: ${item.parcelasPagas > 0 ? 'block' : 'none'};">Desmarcar Última Parcela</button>
+              <div>
+                ${item.parcelasDetalhadas.map(parcela => 
+                  `<p>Parcela ${parcela.numero} - Vencimento: ${parcela.vencimento.toLocaleDateString()} - ${parcela.pago ? "Pago" : "Não Pago"}</p>`
+                ).join('')}
+              </div>
+            `;
+
+            const editarBtn = novoItem.querySelector(".editar");
+            editarBtn.addEventListener("click", () => editarItem(index));
+
+            const excluirBtn = novoItem.querySelector(".excluir");
+            excluirBtn.addEventListener("click", () => excluirItem(index));
+
+            const pagarBtn = novoItem.querySelector(".pagar");
+            pagarBtn.addEventListener("click", () => marcarComoPago(index));
+
+            const desmarcarBtn = novoItem.querySelector(".desmarcar");
+            desmarcarBtn.addEventListener("click", () => desmarcarUltimaParcela(index));
+
+            categoriaMes.appendChild(novoItem);
+        });
+
+        listaItens.appendChild(categoriaMes);
+    });
+}
+
+
+  // Função para salvar o orçamento
+function salvarOrcamento() {
+    const orcamentoJSON = JSON.stringify(orcamento, null, 2); // Transforma o orçamento em JSON
+    const blob = new Blob([orcamentoJSON], { type: "application/json" }); // Cria um Blob com o JSON
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "orcamento.json"; // Define o nome do arquivo
+    link.click(); // Baixa o arquivo
+}
+
+
+  // Função para carregar arquivo
+  carregarOrcamentoInput.addEventListener("change", function (event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      // Converte as strings de data para objetos Date
+      data.forEach(item => {
+        item.vencimento = new Date(item.vencimento);
+      });
+
+      orcamento = data;
+      atualizarListaItens();
+    } catch (error) {
+      alert("Erro ao carregar o arquivo: " + erro.message);
+    }
+  };
+  reader.readAsText(file);
+});
+
+
+   // Função para salvar o orçamento como arquivo JSON
+   function salvarOrcamento() {
+    const dataStr = JSON.stringify(orcamento, null, 2); // Converte o orçamento para JSON formatado
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'orcamento.json'; // Nome do arquivo que será baixado
+    a.click();
+
+    URL.revokeObjectURL(url); // Libera a URL
+  }
+
+
+  salvarOrcamentoBtn.addEventListener("click", salvarOrcamento);
+  abrirPopupBtn.addEventListener("click", abrirPopup);
+  fecharPopupBtn.addEventListener("click", fecharPopup);
+  adicionarItemBtn.addEventListener("click", adicionarItem);
+  
+});
+
+  </script>
+</body>
+</html>
